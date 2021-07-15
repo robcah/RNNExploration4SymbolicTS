@@ -18,6 +18,6 @@ Pandas 1.2.3, NumPy 1.19.2, TensorFlow 2.4.1, and TextDistance 4.2.0
 >>> df_strings = LZWStringLibrary(symbols=3, complexity=10)
 >>> df_strings
 Processing: 1 of 1
-nr_symbols	LZW_complexity	length	string
-0	3	10	12	ABCACBBBCAAA
+  nr_symbols	LZW_complexity	length	string
+0	        3	10	12	ABCACBBBCAAA
 ```
