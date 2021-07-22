@@ -20,7 +20,7 @@ Pandas 1.2.3, NumPy 1.19.2, TensorFlow 2.4.1, and TextDistance 4.2.0
 >>> df_strings
 Processing: 2 of 2
 nr_symbols  LZW_complexity  length  string
-0 3 3 3 BCA
+0     3     3     3     BCA
 1	3	9	12	ABCBBCBBABCC
 
 >>> df_iters = pd.DataFrame()
