@@ -41,10 +41,8 @@ Processing: 2 of 2
 ```
  || jw | dl | total_epochs | seq_test | seq_forecast | total_time | nr_symbols | LZW_complexity | length |
 |:---:| --------:| --------:| --------:| --------------:| --------------:| --------:| ---:| ---:| ---:|
-|0|	1.000000	|1.0	|12	|ABCABCABCA	|ABCABCABCA	|2.685486	|3	|3	|3|
-jw	dl	total_epochs	seq_test	seq_forecast	total_time	nr_symbols	LZW_complexity	length
-0	1.000000	1.0	12	ABCABCABCA	ABCABCABCA	2.685486	3	3	3
-1	1.000000	1.0	14	ABCABCABCA	ABCABCABCA	2.436733	3	3	3
-2	0.657143	0.5	36	CBBCBBABCC	AABCABCABC	3.352712	3	9	12
-3	0.704762	0.4	36	CBBCBBABCC	ABCBABBBBB	3.811584	3	9	12
+|0 |1.000000	|1.0	|12	|ABCABCABCA	|ABCABCABCA	|2.685486	|3	|3	|3|
+|1	|1.000000	|1.0	|14	|ABCABCABCA	|ABCABCABCA	|2.436733	|3	|3	|3|
+|2	|0.657143	|0.5	|36	|CBBCBBABCC	|AABCABCABC	|3.352712	|3	|9	|12|
+|3	|0.704762	|0.4	|36	|CBBCBBABCC	|ABCBABBBBB	|3.811584	|3	|9	|12|
 
