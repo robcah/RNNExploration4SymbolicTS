@@ -19,8 +19,8 @@ Pandas 1.2.3, NumPy 1.19.2, TensorFlow 2.4.1, and TextDistance 4.2.0
 >>> df_strings = LZWStringLibrary(symbols=3, complexity=[3, 9])
 >>> df_strings
 Processing: 2 of 2
-nr_symbols	LZW_complexity	length	string
-0	3	3	3	BCA
+nr_symbols  LZW_complexity  length  string
+0 3 3 3 BCA
 1	3	9	12	ABCBBCBBABCC
 
 >>> df_iters = pd.DataFrame()
@@ -39,13 +39,4 @@ jw	dl	total_epochs	seq_test	seq_forecast	total_time	nr_symbols	LZW_complexity	le
 1	1.000000	1.0	14	ABCABCABCA	ABCABCABCA	2.436733	3	3	3
 2	0.657143	0.5	36	CBBCBBABCC	AABCABCABC	3.352712	3	9	12
 3	0.704762	0.4	36	CBBCBBABCC	ABCBABBBBB	3.811584	3	9	12
-
->>> path = './Code'
->>> sys.path.append(path)
->>> from LZWStringGenerator import *
->>> df_strings = LZWStringLibrary(symbols=3, complexity=10)
->>> df_strings
-Processing: 1 of 1
-  nr_symbols	LZW_complexity	length	      string
-0	   3	            10	    12  ABCACBBBCAAA
 ```
