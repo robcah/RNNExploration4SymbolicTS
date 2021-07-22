@@ -71,7 +71,7 @@ def SymbolList(sym_ts=None):
     return sorted(list(set(sym_ts)))
 
 
-def DataOneHotEncode(sym_ts=None, forecasting=100, X_sequence=100):
+def DataOneHotEncode(sym_ts=None, validation=10, X_window=10):
     '''Produces a one hot encoding from the symbolic time-series, leaving a sequence 
     of length given by forecasting as a prediction test sequence.
     
@@ -79,21 +79,21 @@ def DataOneHotEncode(sym_ts=None, forecasting=100, X_sequence=100):
     ----------
     sym_ts : str
         Symbolic time series, if None the value will be assigned by the default settings of SymbolicTS().
-    forecasting : int
+    validation : int
         Length of the symbolic time-series left to be predicted, default 100.
-    X_sequence :  int
+    X_window :  int
         Length of the window for data "X" sequence, namely the length of ordered inputs to produce a "y" output.
         
     Return
     ------
     array : dataX
         One hot encode array with shape (m, n, p) where m is the symbolic time-series "sym_ts", length minus 
-        the parameter "forecasting" sequence, n stand for the X_sequence; and p stands for the number of 
+        the parameter "validation" sequence, n stand for the X_window; and p stands for the number of 
         symbols used in the time-series.
     array : datay
         One hot code array with shape (m, p) giving the inmediate output value after each dataX input sequence.
     array : dataTest
-        String with length q defined by parameter "forecasting", slice of the last q values of the symbolic 
+        String with length q defined by parameter "validation", slice of the last q values of the symbolic 
         time-series "sym_ts".
     
     Examples
@@ -105,17 +105,17 @@ def DataOneHotEncode(sym_ts=None, forecasting=100, X_sequence=100):
     '''
     
     if sym_ts is None: sym_ts = SymbolicTS()
-    dataXy = sym_ts[:-forecasting]
-    dataTest = sym_ts[-forecasting:]
+    dataXy = sym_ts[:-validation]
+    dataTest = sym_ts[-validation:]
     symbols = SymbolList(dataXy)
     onehot = np.array([[0 if symbol != char else 1 for symbol in symbols] for char in dataXy])
     
     dataX = []
     datay = []
 
-    for i in range(0, len(onehot)-X_sequence, 1):
-        s_in = onehot[i:i+X_sequence]
-        s_out = onehot[i+X_sequence]
+    for i in range(0, len(onehot)-X_window, 1):
+        s_in = onehot[i:i+X_window]
+        s_out = onehot[i+X_window]
         dataX.append(s_in)
         datay.append(s_out)
     
@@ -574,38 +574,102 @@ def History(h, wfolder, delnonoptimals=False):
     return optimisedweights
 
 
-def RNN_Iteration(iteration_idx, string_idx, str_nsymbols, str_complexity, str_len, 
-                  string, max_epochs, n_layers, units_per_layer, lr, batch_size, 
-                  validation_split, architecture, datalen, del_nonoptimals):
+def RNN_Iteration(seed_string='ABC', data_len=100, forecasting_len=10, X_windows=10, 
+                  max_epochs=999, iterations=1, n_layers=1, units_per_layer=100, 
+                  lr=0.01, batch_size=2**8, validation_split=0.05, 
+                  architecture='LSTM', stop_param='loss', stop_val=0.1, 
+                  del_nonoptimals=True, save_report=True, **kwargs):
+    '''Function to produce one or several iterations of selected RNNs cells, with 
+        different settings..
+        
+        Parameters
+        ----------
+        seed_string : str
+            Seed-string of a determinate complexity to be learnt by the RNN.
+        data_len : int
+            Minimal length of dataset produced by the repetition of the 
+            seed-string.
+        max_epochs : int
+            Upper limit of epochs to run during fitting.
+        iterations : int
+            Number of iterations to run with the given settings.
+        n_layers : str
+            Number of layers in the RNN cell.
+        units_per_layer : str
+            Number of units (cells) in each layer of the RNN.
+        lr : float
+            Initial learning rate for the adam optimizer.
+        batch_size : int
+            Size of the batch to process during fitting.
+        validation_split : float
+            Portion of training data to use as validation during fitting.
+        architecture : str
+            Type of cell, takes: LSTM, GRU, simple RNN, nBRC, BRC, MGU, MGU1
+            MGU2 and MGU3.
+        stop_param : str
+            Alternative early stopping parameter, 'loss' for based on the 
+            loss function, 'acc' for based on accuracy.
+        stop_val : float
+            Threshold that triggers the early stopping.
+        del_nonoptimals :  boolean
+            If True, all non optimal weights will be deleted.
+        save_report : boolean
+            If True a CSV file with a summary of the fitting is created.
+        kwargs : dict
+            Extra arguments used only to identify the seed-string.
+        
+        Returns
+        -------
+        df_summary : pandas.DataFrame
+            Summary of the fitting process, with columns: jw (Jaro-Winkler 
+            distance), dl (Damerau-Levenshtein distance), total_epochs 
+            (epochs to reach stopping criterum), seq_test (validation 
+            sequence), seq_forecast (forecasted sequence), total_time 
+            (total time to reach stopping criteria). The rows are the 
+            number of iterations.
     
-    print(string)
-    sym_ts = SymbolicTS(string, datalen=datalen)
+    '''    
+    
+    print('Seed string: {}'.format(seed_string))
+    sym_ts = SymbolicTS(seed_string, datalen=data_len)
     real_datalen = len(sym_ts)
-    dataX, datay, dataTest = DataOneHotEncode(sym_ts)
+    dataX, datay, dataTest = DataOneHotEncode(sym_ts,
+                                             forecasting_len,
+                                             X_windows)
 
     dataX = np.array(dataX)
     datay = np.array(datay)
     X_shape = np.shape(dataX)
     y_shape = np.shape(datay)
     print(X_shape, y_shape)
+    
+    df_summary = pd.DataFrame()
+    for iteration_idx in range(iterations):
+        
+        M = simpleRNN(X_shape=X_shape, y_shape=y_shape, n_layers=n_layers, 
+                       units_per_layer=units_per_layer, sym_ts=sym_ts, lr=lr, 
+                      architecture=architecture)
+        M.Build()
+        M.Train(X=dataX, y=datay, epochs=max_epochs, batch_size=batch_size, 
+                validation_split=validation_split, param=stop_param, stopval=stop_val)
 
-    M = simpleRNN(X_shape=X_shape, y_shape=y_shape, n_layers=n_layers, 
-                   units_per_layer=units_per_layer, sym_ts=sym_ts, lr=lr, 
-                  architecture=architecture)
-    M.Build()
-    M.Train(X=dataX, y=datay, epochs=max_epochs, batch_size=batch_size, 
-            validation_split=validation_split, param='loss', stopval=0.1)
+        jw, dl, seq_test, seq_forecast = M.Forecast(dataY=datay, dataTest=dataTest, 
+                                               delnonoptimals=del_nonoptimals)
+
+        if save_report:
+
+            df = pd.DataFrame(M.h.history)
+            df['secs_epoch'] = M.process_time.times
+            string_id = '{}'.format('.'.join('{:02}'.format(v) for v in kwargs.values())) if kwargs else 'NoInfo'
+            name_features = [string_id, iteration_idx, n_layers, units_per_layer, architecture]
+            df.to_csv('Monitoring-StringId-{}_Layers-{:02}_Cells-{:02}_{}.csv'.format(
+                *name_features), index=False)
+
+        total_epochs = len(M.h.history['loss'])
+        total_time = sum(M.process_time.times)
+        summary = dict(jw=jw, dl=dl, total_epochs=total_epochs, seq_test=seq_test, 
+                       seq_forecast=seq_forecast, total_time=total_time)
+        summary = pd.DataFrame(summary, index=[iteration_idx])
+        df_summary = df_summary.append(summary)
     
-    jw, dl, seq_test, seq_forecast = M.Forecast(dataY=datay, dataTest=dataTest, 
-                                           delnonoptimals=del_nonoptimals)
-    
-    total_epochs = len(M.h.history['loss'])
-    
-    df = pd.DataFrame(M.h.history)
-    df['secs_epoch'] = M.process_time.times
-    df.to_csv('IterMonitoring-{:02}.{:04}_C{:02}S{:02}_Layers-{:02}_Cells-{:02}_{}.csv'.format(
-                string_idx, iteration_idx, str_complexity, str_nsymbols, n_layers, units_per_layer, 
-        architecture), index=False)
-    total_time = sum(M.process_time.times)
-    
-    return total_epochs, total_time, seq_test, seq_forecast, jw, dl, datalen, real_datalen
+    return df_summary 
