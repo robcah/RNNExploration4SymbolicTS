@@ -23,9 +23,7 @@ Processing: 2 of 2
  ||nr_symbols | LZW_complexity | length | string |
 |:---:| ----------:| --------------:| -------:| ------:|
 | 0 | 3 | 3 | 3 | BCA |
-nr_symbols  LZW_complexity  length        string
-0        3               3       3           BCA
-1	       3	             9	    12	ABCBBCBBABCC
+| 1 | 3 | 9 | 12 | ABCBBCBBABCC |
 ```
 >>> df_iters = pd.DataFrame()
 >>> for i, string in enumerate(df_strings['string']):
