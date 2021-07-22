@@ -24,7 +24,7 @@ Processing: 2 of 2
 |:---:| ----------:| --------------:| -------:| ------:|
 | 0 | 3 | 3 | 3 | BCA |
 | 1 | 3 | 9 | 12 | ABCBBCBBABCC |
-```
+```python
 >>> df_iters = pd.DataFrame()
 >>> for i, string in enumerate(df_strings['string']):
 >>>     kwargs = df_strings.iloc[i,:-1].to_dict()
@@ -35,7 +35,7 @@ Processing: 2 of 2
 >>> df_iter.reset_index(drop=True, inplace=True)
 ```
 ...
-```
+```python
 >>> df_iters.reset_index(drop=True, inplace=True)
 >>> df_iters
 ```
