@@ -1,10 +1,8 @@
 # RNNExploration4SymbolicTS
 
-Library to explore the hyper-paramenter space in RNNS
+Library to explore the hyper-parameter space of Recurrent Neural Networks (RNNs)
 
-This repository contains a library for the creation of strings of determinate complexity using
-LZW compressing method as base. It also cointains the tools for the exploration of the 
-hyperparameter space of commonly used RNNS as well as novel ones.
+This repository contains a library for the generation of strings of tunable complexity using the LZW compressing method as base to approximate Kolmogorov complexity. It also contains the tools for the exploration of the hyperparameter space of commonly used RNNs as well as novel ones.
 
 ### Prerequisites
 Pandas 1.2.3, NumPy 1.19.2, TensorFlow 2.4.1, and TextDistance 4.2.0
